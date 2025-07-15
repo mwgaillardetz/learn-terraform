@@ -3,10 +3,7 @@
 
 A comprehensive, modern practice platform for the HashiCorp Terraform Associate (003) certification exam featuring an interactive study guide, multiple exam formats, advanced performance analytics, and full mobile responsiveness.
 
-## 🚀 Features
-
-### ✅ Complete Feature Set
-
+##Features
 - **📚 Interactive Study Guide**: Comprehensive study materials organized by all 9 certification objectives
 - **🎯 Multiple Exam Formats**:
   - Full practice exam (30 questions, 45 minutes)
@@ -22,7 +19,7 @@ A comprehensive, modern practice platform for the HashiCorp Terraform Associate 
 - **⚡ Zero Dependencies**: Lightweight, fast-loading vanilla JavaScript application
 - **🐳 Simplified Docker Setup**: Easy containerized deployment without complex orchestration
 
-### 🎓 Study Guide Coverage (All 9 Objectives)
+### Study Guide Coverage (All 9 Objectives)
 
 1. **Understand Infrastructure as Code (IaC) concepts**
 2. **Understand Terraform's purpose (vs other IaC)**
@@ -34,7 +31,7 @@ A comprehensive, modern practice platform for the HashiCorp Terraform Associate 
 8. **Read, generate, and modify configuration**
 9. **Understand Terraform Cloud and Enterprise capabilities**
 
-## 🏃‍♂️ Quick Start
+## Quick Start
 
 ### Option 1: Direct Access
 Simply open `index.html` in any modern web browser - no server required!
@@ -80,7 +77,7 @@ docker-compose up -d
 open http://localhost:4880
 ```
 
-## 📖 How to Use
+## How to Use
 
 ### 🎓 Study Guide Mode
 1. Click **"Study Guide"** from the welcome screen
@@ -89,7 +86,7 @@ open http://localhost:4880
 4. Use **"Practice Questions for This Objective"** to test specific knowledge areas
 5. Navigate back to study guide or home easily
 
-### 🎯 Practice Exam Modes
+### Practice Exam Modes
 
 #### Full Practice Exam
 1. Click **"Practice Exams"** → **"Full Practice Exam"**
@@ -105,20 +102,14 @@ open http://localhost:4880
 4. Perfect for deep learning and reviewing weak areas without time pressure
 5. **Study mode** - focus on understanding concepts rather than speed
 
-### 📊 Performance Analytics & Review
+### Performance Analytics & Review
 - **Real-time scoring** with immediate feedback on each question
 - **Objective-level breakdown** showing performance across all 9 areas
 - **Detailed answer review** with comprehensive explanations
 - **Study recommendations** based on performance gaps
 - **Progress tracking** across multiple exam attempts
 
-### 🌓 Theme & Accessibility
-- **Dark/Light theme toggle** in the top-right corner
-- **Mobile-optimized interface** with touch-friendly interactions
-- **Keyboard navigation** support for accessibility
-- **Responsive design** that works on all devices
-
-## 📁 Project Structure
+## Project Structure
 
 ```
 learn-terraform/
@@ -139,7 +130,7 @@ learn-terraform/
 - **styles.css**: Modern CSS with themes, mobile responsiveness, accessibility
 - **questions.js**: 50+ categorized questions + detailed study guide content
 
-## 🎯 Question Bank & Content
+## Question Bank & Content
 
 ### Question Database
 - **200+ comprehensive questions** covering all certification objectives
