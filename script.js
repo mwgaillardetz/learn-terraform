@@ -2,13 +2,13 @@
 function toggleTheme() {
     const currentTheme = document.documentElement.getAttribute('data-theme');
     const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    
+
     document.documentElement.setAttribute('data-theme', newTheme);
-    
+
     // Update theme icon
     const themeIcon = document.querySelector('.theme-icon');
     themeIcon.textContent = newTheme === 'light' ? '☀️' : '🌙';
-    
+
     // Save theme preference
     localStorage.setItem('theme', newTheme);
 }
@@ -17,7 +17,7 @@ function toggleTheme() {
 function initializeTheme() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
-    
+
     // Update theme icon
     const themeIcon = document.querySelector('.theme-icon');
     if (themeIcon) {
@@ -40,7 +40,7 @@ class TerraformExamPlatform {
         this.reviewIndex = 0;
         this.timer = null;
         this.timeRemaining = 0;
-        
+
         this.init();
     }
 
@@ -90,13 +90,13 @@ class TerraformExamPlatform {
             const card = document.createElement('div');
             card.className = 'objective-card';
             card.onclick = () => this.showObjectiveDetail(parseInt(objectiveId));
-            
+
             card.innerHTML = `
                 <div class="objective-number">Objective ${objectiveId}</div>
                 <h3>${objective.title}</h3>
                 <div class="topic-count">${objective.content.length} Topics</div>
             `;
-            
+
             grid.appendChild(card);
         });
     }
@@ -107,17 +107,17 @@ class TerraformExamPlatform {
             console.error('Objective not found:', objectiveId);
             return;
         }
-        
+
         this.currentObjective = objectiveId;
-        
+
         document.getElementById('objective-title').innerHTML = `
             <span class="objective-number">Objective ${objectiveId}</span>
             <h1>${objective.title}</h1>
         `;
-        
+
         const content = document.getElementById('objective-content');
         content.innerHTML = '';
-        
+
         objective.content.forEach(item => {
             const section = document.createElement('div');
             section.className = 'content-section';
@@ -127,7 +127,7 @@ class TerraformExamPlatform {
             `;
             content.appendChild(section);
         });
-        
+
         this.showScreen('objective-detail-screen');
     }
 
@@ -143,20 +143,20 @@ class TerraformExamPlatform {
         Object.keys(studyGuide).forEach(objectiveId => {
             const objective = studyGuide[objectiveId];
             const questionsForObjective = examQuestions.filter(q => q.objective === parseInt(objectiveId));
-            
+
             const card = document.createElement('div');
             card.className = 'category-card';
             card.onclick = () => this.startCategoryExam(parseInt(objectiveId));
-            
+
             card.innerHTML = `
                 <div class="category-number">Objective ${objectiveId}</div>
                 <h3>${objective.title}</h3>
                 <div class="category-stats">
                     <span>${questionsForObjective.length} Questions</span>
-                    <span>~${Math.ceil(questionsForObjective.length * 1.5)} min</span>
+                    <span>Untimed Study Mode</span>
                 </div>
             `;
-            
+
             grid.appendChild(card);
         });
     }
@@ -164,8 +164,8 @@ class TerraformExamPlatform {
     // Exam methods
     startFullExam() {
         this.examType = 'full';
-        this.setupExam(this.getRandomQuestions(30));
-        this.timeRemaining = 45 * 60; // 45 minutes
+        this.setupExam(this.getRandomQuestions(57)); // Match real exam question count
+        this.timeRemaining = 60 * 60; // 60 minutes to match real exam
         this.startExam();
     }
 
@@ -174,7 +174,7 @@ class TerraformExamPlatform {
         this.currentObjective = objectiveId;
         const questionsForObjective = examQuestions.filter(q => q.objective === objectiveId);
         this.setupExam(this.shuffleArray([...questionsForObjective]));
-        this.timeRemaining = Math.max(questionsForObjective.length * 90, 300); // 1.5 min per question, min 5 min
+        this.timeRemaining = 0; // No timer for category exams - untimed study mode
         this.startExam();
     }
 
@@ -183,8 +183,49 @@ class TerraformExamPlatform {
     }
 
     getRandomQuestions(count) {
+        // For full exam, ensure balanced distribution across objectives
+        if (this.examType === 'full') {
+            return this.getBalancedRandomQuestions(count);
+        }
+
+        // For other cases, use pure randomization
         const shuffled = this.shuffleArray([...examQuestions]);
         return shuffled.slice(0, count);
+    }
+
+    getBalancedRandomQuestions(count) {
+        const questionsByObjective = {};
+        const questionsPerObjective = Math.floor(count / 9); // Distribute evenly across 9 objectives
+        const remainder = count % 9;
+
+        // Group questions by objective
+        examQuestions.forEach(question => {
+            if (!questionsByObjective[question.objective]) {
+                questionsByObjective[question.objective] = [];
+            }
+            questionsByObjective[question.objective].push(question);
+        });
+
+        const selectedQuestions = [];
+
+        // Select questions from each objective
+        for (let objective = 1; objective <= 9; objective++) {
+            const objectiveQuestions = questionsByObjective[objective] || [];
+            const shuffled = this.shuffleArray([...objectiveQuestions]);
+
+            // Base amount per objective plus extra for first few objectives if there's remainder
+            const numToTake = questionsPerObjective + (objective <= remainder ? 1 : 0);
+
+            // Take questions (repeat if necessary to meet count)
+            for (let i = 0; i < numToTake; i++) {
+                if (shuffled.length > 0) {
+                    selectedQuestions.push(shuffled[i % shuffled.length]);
+                }
+            }
+        }
+
+        // Final shuffle of selected questions
+        return this.shuffleArray(selectedQuestions);
     }
 
     shuffleArray(array) {
@@ -203,7 +244,16 @@ class TerraformExamPlatform {
 
     startExam() {
         this.showScreen('exam-screen');
-        this.startTimer();
+
+        // Show/hide timer based on exam type
+        const timerElement = document.getElementById('timer');
+        if (this.timeRemaining > 0) {
+            timerElement.style.display = 'inline-block';
+            this.startTimer();
+        } else {
+            timerElement.style.display = 'none';
+        }
+
         this.displayQuestion();
     }
 
@@ -212,7 +262,7 @@ class TerraformExamPlatform {
         this.timer = setInterval(() => {
             this.timeRemaining--;
             this.updateTimer();
-            
+
             if (this.timeRemaining <= 0) {
                 this.finishExam();
             }
@@ -220,28 +270,30 @@ class TerraformExamPlatform {
     }
 
     updateTimer() {
-        const minutes = Math.floor(this.timeRemaining / 60);
-        const seconds = this.timeRemaining % 60;
-        document.getElementById('timer').textContent = 
-            `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        if (this.timeRemaining > 0) {
+            const minutes = Math.floor(this.timeRemaining / 60);
+            const seconds = this.timeRemaining % 60;
+            document.getElementById('timer').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
     }
 
     displayQuestion() {
         const question = this.examQuestions[this.currentQuestionIndex];
-        
+
         // Update progress
-        document.getElementById('questionCounter').textContent = 
+        document.getElementById('questionCounter').textContent =
             `Question ${this.currentQuestionIndex + 1} of ${this.examQuestions.length}`;
-        
+
         const progressPercent = ((this.currentQuestionIndex + 1) / this.examQuestions.length) * 100;
         document.getElementById('progressFill').style.width = `${progressPercent}%`;
-        
+
         // Update question content
         document.getElementById('questionText').textContent = question.question;
         document.getElementById('difficultyBadge').textContent = question.difficulty;
         document.getElementById('difficultyBadge').className = `difficulty-badge ${question.difficulty.toLowerCase()}`;
         document.getElementById('objectiveBadge').textContent = `Objective ${question.objective}`;
-        
+
         // Show/hide code block
         const codeBlock = document.getElementById('codeBlock');
         if (question.code) {
@@ -250,7 +302,7 @@ class TerraformExamPlatform {
         } else {
             codeBlock.style.display = 'none';
         }
-        
+
         // Display options
         this.displayOptions(question);
     }
@@ -258,29 +310,29 @@ class TerraformExamPlatform {
     displayOptions(question) {
         const container = document.getElementById('optionsContainer');
         container.innerHTML = '';
-        
+
         question.options.forEach((option, index) => {
             const optionDiv = document.createElement('div');
             optionDiv.className = 'option';
             optionDiv.onclick = () => this.selectOption(index);
-            
+
             const isSelected = this.userAnswers[this.currentQuestionIndex] === index;
             if (isSelected) {
                 optionDiv.classList.add('selected');
             }
-            
+
             optionDiv.innerHTML = `
                 <div class="option-letter">${String.fromCharCode(65 + index)}</div>
                 <div class="option-text">${option}</div>
             `;
-            
+
             container.appendChild(optionDiv);
         });
     }
 
     selectOption(optionIndex) {
         this.userAnswers[this.currentQuestionIndex] = optionIndex;
-        
+
         // Update visual selection
         document.querySelectorAll('.option').forEach((option, index) => {
             option.classList.toggle('selected', index === optionIndex);
@@ -319,27 +371,27 @@ class TerraformExamPlatform {
     calculateResults() {
         let correctAnswers = 0;
         const objectiveScores = {};
-        
+
         // Initialize objective scores
         for (let i = 1; i <= 9; i++) {
             objectiveScores[i] = { correct: 0, total: 0 };
         }
-        
+
         this.examQuestions.forEach((question, index) => {
             const userAnswer = this.userAnswers[index];
             const isCorrect = userAnswer === question.correctAnswer;
-            
+
             if (isCorrect) {
                 correctAnswers++;
             }
-            
+
             // Track by objective
             objectiveScores[question.objective].total++;
             if (isCorrect) {
                 objectiveScores[question.objective].correct++;
             }
         });
-        
+
         this.results = {
             totalQuestions: this.examQuestions.length,
             correctAnswers,
@@ -350,10 +402,10 @@ class TerraformExamPlatform {
 
     showResults() {
         this.showScreen('results-screen');
-        
+
         // Display score
         document.getElementById('scorePercentage').textContent = `${this.results.percentage}%`;
-        
+
         // Display performance stats
         const statsContainer = document.getElementById('performanceStats');
         statsContainer.innerHTML = `
@@ -366,7 +418,7 @@ class TerraformExamPlatform {
                 <span class="stat-value">${this.results.percentage >= 70 ? '✅ PASS' : '❌ FAIL'}</span>
             </div>
         `;
-        
+
         // Display objective breakdown
         this.displayObjectiveBreakdown();
     }
@@ -374,15 +426,15 @@ class TerraformExamPlatform {
     displayObjectiveBreakdown() {
         const container = document.getElementById('objectiveBreakdown');
         container.innerHTML = '';
-        
+
         Object.entries(this.results.objectiveScores).forEach(([objectiveId, scores]) => {
             if (scores.total === 0) return;
-            
+
             const objective = studyGuide[objectiveId];
             if (!objective) return;
-            
+
             const percentage = scores.total > 0 ? Math.round((scores.correct / scores.total) * 100) : 0;
-            
+
             const objectiveDiv = document.createElement('div');
             objectiveDiv.className = 'objective-score';
             objectiveDiv.innerHTML = `
@@ -397,7 +449,7 @@ class TerraformExamPlatform {
                     ${percentage < 70 ? '📚 Review this objective' : '✅ Strong performance'}
                 </div>
             `;
-            
+
             container.appendChild(objectiveDiv);
         });
     }
@@ -413,22 +465,22 @@ class TerraformExamPlatform {
         const question = this.examQuestions[this.reviewIndex];
         const userAnswer = this.userAnswers[this.reviewIndex];
         const isCorrect = userAnswer === question.correctAnswer;
-        
+
         // Update navigation
-        document.getElementById('reviewCounter').textContent = 
+        document.getElementById('reviewCounter').textContent =
             `Question ${this.reviewIndex + 1} of ${this.examQuestions.length}`;
-        
+
         // Update question content
         document.getElementById('reviewQuestionText').textContent = question.question;
         document.getElementById('reviewDifficultyBadge').textContent = question.difficulty;
         document.getElementById('reviewDifficultyBadge').className = `difficulty-badge ${question.difficulty.toLowerCase()}`;
         document.getElementById('reviewObjectiveBadge').textContent = `Objective ${question.objective}`;
-        
+
         // Update result badge
         const resultBadge = document.getElementById('resultBadge');
         resultBadge.textContent = isCorrect ? 'Correct' : 'Incorrect';
         resultBadge.className = `result-badge ${isCorrect ? 'correct' : 'incorrect'}`;
-        
+
         // Show/hide code block
         const codeBlock = document.getElementById('reviewCodeBlock');
         if (question.code) {
@@ -437,16 +489,16 @@ class TerraformExamPlatform {
         } else {
             codeBlock.style.display = 'none';
         }
-        
+
         // Display answers
-        document.getElementById('userAnswer').textContent = 
+        document.getElementById('userAnswer').textContent =
             userAnswer !== null ? `${String.fromCharCode(65 + userAnswer)}. ${question.options[userAnswer]}` : 'Not answered';
-        document.getElementById('correctAnswer').textContent = 
+        document.getElementById('correctAnswer').textContent =
             `${String.fromCharCode(65 + question.correctAnswer)}. ${question.options[question.correctAnswer]}`;
-        
+
         // Display explanation
         document.getElementById('answerExplanation').textContent = question.explanation;
-        
+
         // Update answer styling
         const userAnswerEl = document.getElementById('userAnswer');
         userAnswerEl.className = `answer-option ${isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
