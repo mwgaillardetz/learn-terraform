@@ -3,7 +3,7 @@
 
 A comprehensive, modern practice platform for the HashiCorp Terraform Associate (003) certification exam featuring an interactive study guide, multiple exam formats, advanced performance analytics, and full mobile responsiveness.
 
-##Features
+## Features
 - **📚 Interactive Study Guide**: Comprehensive study materials organized by all 9 certification objectives
 - **🎯 Multiple Exam Formats**:
   - Full practice exam (30 questions, 45 minutes)
