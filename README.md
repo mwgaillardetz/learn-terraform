@@ -79,7 +79,7 @@ open http://localhost:4880
 
 ## How to Use
 
-### 🎓 Study Guide Mode
+### Study Guide Mode
 1. Click **"Study Guide"** from the welcome screen
 2. Browse all 9 certification objectives with detailed explanations
 3. Click on any objective to view comprehensive study materials
