@@ -1,3 +1,33 @@
+// Theme Management
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    
+    document.documentElement.setAttribute('data-theme', newTheme);
+    
+    // Update theme icon
+    const themeIcon = document.querySelector('.theme-icon');
+    themeIcon.textContent = newTheme === 'light' ? '☀️' : '🌙';
+    
+    // Save theme preference
+    localStorage.setItem('theme', newTheme);
+}
+
+// Initialize theme from localStorage or default to dark
+function initializeTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    
+    // Update theme icon
+    const themeIcon = document.querySelector('.theme-icon');
+    if (themeIcon) {
+        themeIcon.textContent = savedTheme === 'light' ? '☀️' : '🌙';
+    }
+}
+
+// Initialize theme when page loads
+document.addEventListener('DOMContentLoaded', initializeTheme);
+
 // Enhanced Terraform Associate Practice Platform
 class TerraformExamPlatform {
     constructor() {
