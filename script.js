@@ -40,6 +40,7 @@ class TerraformExamPlatform {
         this.reviewIndex = 0;
         this.timer = null;
         this.timeRemaining = 0;
+        this.recentQuestions = this.loadRecentQuestions();
 
         this.init();
     }
@@ -173,8 +174,11 @@ class TerraformExamPlatform {
         this.examType = 'category';
         this.currentObjective = objectiveId;
         const questionsForObjective = examQuestions.filter(q => q.objective === objectiveId);
-        this.setupExam(this.shuffleArray([...questionsForObjective]));
-        this.timeRemaining = 0; // No timer for category exams - untimed study mode
+        const availableQuestions = this.filterRecentQuestions(questionsForObjective);
+        const shuffledQuestions = this.shuffleArray([...availableQuestions]);
+        this.trackRecentQuestions(shuffledQuestions);
+        this.setupExam(shuffledQuestions);
+        this.timeRemaining = 0;
         this.startExam();
     }
 
@@ -195,10 +199,9 @@ class TerraformExamPlatform {
 
     getBalancedRandomQuestions(count) {
         const questionsByObjective = {};
-        const questionsPerObjective = Math.floor(count / 9); // Distribute evenly across 9 objectives
+        const questionsPerObjective = Math.floor(count / 9);
         const remainder = count % 9;
 
-        // Group questions by objective
         examQuestions.forEach(question => {
             if (!questionsByObjective[question.objective]) {
                 questionsByObjective[question.objective] = [];
@@ -208,15 +211,12 @@ class TerraformExamPlatform {
 
         const selectedQuestions = [];
 
-        // Select questions from each objective
         for (let objective = 1; objective <= 9; objective++) {
             const objectiveQuestions = questionsByObjective[objective] || [];
-            const shuffled = this.shuffleArray([...objectiveQuestions]);
-
-            // Base amount per objective plus extra for first few objectives if there's remainder
+            const availableQuestions = this.filterRecentQuestions(objectiveQuestions);
+            const shuffled = this.shuffleArray([...availableQuestions]);
             const numToTake = questionsPerObjective + (objective <= remainder ? 1 : 0);
 
-            // Take questions (repeat if necessary to meet count)
             for (let i = 0; i < numToTake; i++) {
                 if (shuffled.length > 0) {
                     selectedQuestions.push(shuffled[i % shuffled.length]);
@@ -224,8 +224,9 @@ class TerraformExamPlatform {
             }
         }
 
-        // Final shuffle of selected questions
-        return this.shuffleArray(selectedQuestions);
+        const finalQuestions = this.shuffleArray(selectedQuestions);
+        this.trackRecentQuestions(finalQuestions);
+        return finalQuestions;
     }
 
     shuffleArray(array) {
@@ -303,6 +304,9 @@ class TerraformExamPlatform {
             codeBlock.style.display = 'none';
         }
 
+        // Clear any existing explanation
+        this.hideInstantExplanation();
+        
         // Display options
         this.displayOptions(question);
     }
@@ -333,10 +337,31 @@ class TerraformExamPlatform {
     selectOption(optionIndex) {
         this.userAnswers[this.currentQuestionIndex] = optionIndex;
 
-        // Update visual selection
-        document.querySelectorAll('.option').forEach((option, index) => {
-            option.classList.toggle('selected', index === optionIndex);
-        });
+        // For untimed exams, show instant feedback
+        if (this.timeRemaining === 0) {
+            const question = this.examQuestions[this.currentQuestionIndex];
+            const isCorrect = optionIndex === question.correctAnswer;
+            
+            document.querySelectorAll('.option').forEach((option, index) => {
+                option.classList.remove('selected', 'correct-feedback', 'incorrect-feedback');
+                
+                if (index === question.correctAnswer) {
+                    option.classList.add('correct-feedback');
+                } else if (index === optionIndex && !isCorrect) {
+                    option.classList.add('incorrect-feedback');
+                }
+            });
+            
+            // Show explanation after a brief delay
+            setTimeout(() => {
+                this.showInstantExplanation(question, isCorrect);
+            }, 500);
+        } else {
+            // Timed exam - just show selection
+            document.querySelectorAll('.option').forEach((option, index) => {
+                option.classList.toggle('selected', index === optionIndex);
+            });
+        }
     }
 
     nextQuestion() {
@@ -535,6 +560,59 @@ class TerraformExamPlatform {
         this.reviewIndex = 0;
         this.timeRemaining = 0;
         this.results = null;
+        this.hideInstantExplanation();
+    }
+
+    showInstantExplanation(question, isCorrect) {
+        let explanationDiv = document.getElementById('instantExplanation');
+        if (!explanationDiv) {
+            explanationDiv = document.createElement('div');
+            explanationDiv.id = 'instantExplanation';
+            explanationDiv.className = 'instant-explanation';
+            document.querySelector('.question-container').appendChild(explanationDiv);
+        }
+        
+        explanationDiv.innerHTML = `
+            <div class="feedback-header ${isCorrect ? 'correct' : 'incorrect'}">
+                <span class="feedback-icon">${isCorrect ? '✅' : '❌'}</span>
+                <span class="feedback-text">${isCorrect ? 'Correct!' : 'Incorrect'}</span>
+            </div>
+            <div class="explanation-text">
+                <strong>Explanation:</strong> ${question.explanation}
+            </div>
+        `;
+        
+        explanationDiv.style.display = 'block';
+    }
+
+    hideInstantExplanation() {
+        const explanationDiv = document.getElementById('instantExplanation');
+        if (explanationDiv) {
+            explanationDiv.style.display = 'none';
+        }
+    }
+
+    loadRecentQuestions() {
+        try {
+            return JSON.parse(localStorage.getItem('terraform_recent_questions') || '[]');
+        } catch {
+            return [];
+        }
+    }
+
+    saveRecentQuestions() {
+        localStorage.setItem('terraform_recent_questions', JSON.stringify(this.recentQuestions));
+    }
+
+    trackRecentQuestions(questions) {
+        const questionIds = questions.map(q => q.id);
+        this.recentQuestions = [...questionIds, ...this.recentQuestions].slice(0, 30);
+        this.saveRecentQuestions();
+    }
+
+    filterRecentQuestions(questions) {
+        const filtered = questions.filter(q => !this.recentQuestions.includes(q.id));
+        return filtered.length >= Math.min(10, questions.length * 0.5) ? filtered : questions;
     }
 }
 

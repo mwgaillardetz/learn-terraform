@@ -844,6 +844,28 @@ body {
     color: white;
 }
 
+.option.correct-feedback {
+    border-color: var(--success);
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--text-primary);
+}
+
+.option.correct-feedback .option-letter {
+    background: var(--success);
+    color: white;
+}
+
+.option.incorrect-feedback {
+    border-color: var(--error);
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--text-primary);
+}
+
+.option.incorrect-feedback .option-letter {
+    background: var(--error);
+    color: white;
+}
+
 .option-text {
     flex: 1;
     line-height: 1.5;
@@ -1102,6 +1124,54 @@ body {
 .explanation-section p {
     color: #666;
     line-height: 1.6;
+}
+
+/* Instant Feedback Styles */
+.instant-explanation {
+    background: var(--bg-card-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 1.5rem;
+    display: none;
+    animation: slideIn 0.3s ease-out;
+}
+
+.feedback-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.feedback-header.correct {
+    color: var(--success);
+}
+
+.feedback-header.incorrect {
+    color: var(--error);
+}
+
+.feedback-icon {
+    font-size: 1.2rem;
+}
+
+.explanation-text {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 /* Responsive Design */
