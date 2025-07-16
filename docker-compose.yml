@@ -1,6 +1,6 @@
 ---
 services:
-  terraform-exam:
+  terraform-practice-exam:
     build: .
     container_name: terraform-practice-exam
     ports:
