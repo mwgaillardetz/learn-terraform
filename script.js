@@ -381,10 +381,8 @@ class TerraformExamPlatform {
     }
 
     exitExam() {
-        if (confirm('Are you sure you want to exit the exam? Your progress will be lost.')) {
-            this.resetExam();
-            this.goHome();
-        }
+        this.resetExam();
+        this.goHome();
     }
 
     finishExam() {

@@ -474,51 +474,53 @@ body {
 
 /* Objective Detail Styles */
 .objective-header {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow);
+    border: 1px solid var(--border-color);
 }
 
 .objective-title h1 {
-    color: #333;
+    color: var(--text-primary);
     margin-bottom: 1rem;
 }
 
 .objective-description {
-    color: #666;
+    color: var(--text-secondary);
     font-size: 1.1rem;
     line-height: 1.6;
 }
 
 .objective-content {
-    background: white;
+    background: var(--bg-card);
     border-radius: 16px;
     padding: 2rem;
     margin-bottom: 2rem;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 12px var(--shadow);
+    border: 1px solid var(--border-color);
 }
 
-.topic-section {
+.content-section {
     margin-bottom: 3rem;
     padding-bottom: 2rem;
-    border-bottom: 1px solid #eee;
+    border-bottom: 1px solid var(--border-color);
 }
 
-.topic-section:last-child {
+.content-section:last-child {
     border-bottom: none;
     margin-bottom: 0;
 }
 
-.topic-section h3 {
-    color: #333;
+.content-section h3 {
+    color: var(--text-primary);
     margin-bottom: 1rem;
     font-size: 1.4rem;
 }
 
-.topic-content {
-    color: #666;
+.content-section p {
+    color: var(--text-secondary);
     line-height: 1.8;
     font-size: 1rem;
 }
