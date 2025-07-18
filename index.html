@@ -72,6 +72,20 @@
                 <!-- Content will be populated by JavaScript -->
             </div>
 
+            <!-- Study Guide Navigation -->
+            <div class="study-navigation">
+                <button class="btn-nav" id="prev-objective-btn" onclick="navigateObjective('prev')" disabled>
+                    ← Previous Objective
+                </button>
+                <div class="navigation-info">
+                    <span class="objective-counter" id="objective-counter">Objective 1 of 9</span>
+                    <div class="keyboard-hint">Use ← → arrow keys to navigate</div>
+                </div>
+                <button class="btn-nav" id="next-objective-btn" onclick="navigateObjective('next')">
+                    Next Objective →
+                </button>
+            </div>
+
             <div class="objective-actions">
                 <button class="btn-secondary" onclick="startObjectiveExam()">Practice Questions for This Objective</button>
             </div>

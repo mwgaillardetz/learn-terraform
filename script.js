@@ -48,6 +48,25 @@ class TerraformExamPlatform {
     init() {
         this.populateStudyGuide();
         this.populateCategoryExams();
+        this.setupKeyboardNavigation();
+    }
+
+    setupKeyboardNavigation() {
+        document.addEventListener('keydown', (event) => {
+            // Only handle keyboard navigation when on objective detail screen
+            if (this.currentScreen !== 'objective-detail-screen') {
+                return;
+            }
+
+            // Handle arrow key navigation
+            if (event.key === 'ArrowLeft' && this.currentObjective > 1) {
+                event.preventDefault();
+                this.navigateObjective('prev');
+            } else if (event.key === 'ArrowRight' && this.currentObjective < 9) {
+                event.preventDefault();
+                this.navigateObjective('next');
+            }
+        });
     }
 
     // Navigation methods
@@ -122,14 +141,58 @@ class TerraformExamPlatform {
         objective.content.forEach(item => {
             const section = document.createElement('div');
             section.className = 'content-section';
+            
+            // Convert formatted text to HTML
+            const formattedDetails = this.formatStudyContent(item.details);
+            
             section.innerHTML = `
                 <h3>${item.topic}</h3>
-                <p>${item.details}</p>
+                <div class="formatted-content">${formattedDetails}</div>
             `;
             content.appendChild(section);
         });
 
+        // Update navigation state
+        this.updateNavigationState(objectiveId);
+
         this.showScreen('objective-detail-screen');
+    }
+
+    updateNavigationState(objectiveId) {
+        const prevBtn = document.getElementById('prev-objective-btn');
+        const nextBtn = document.getElementById('next-objective-btn');
+        const counter = document.getElementById('objective-counter');
+
+        // Update counter
+        counter.textContent = `Objective ${objectiveId} of 9`;
+
+        // Update previous button
+        if (objectiveId <= 1) {
+            prevBtn.disabled = true;
+        } else {
+            prevBtn.disabled = false;
+        }
+
+        // Update next button
+        if (objectiveId >= 9) {
+            nextBtn.disabled = true;
+        } else {
+            nextBtn.disabled = false;
+        }
+    }
+
+    navigateObjective(direction) {
+        let newObjectiveId;
+        
+        if (direction === 'prev' && this.currentObjective > 1) {
+            newObjectiveId = this.currentObjective - 1;
+        } else if (direction === 'next' && this.currentObjective < 9) {
+            newObjectiveId = this.currentObjective + 1;
+        } else {
+            return; // Can't navigate in that direction
+        }
+
+        this.showObjectiveDetail(newObjectiveId);
     }
 
     // Category Exams methods
@@ -612,6 +675,74 @@ class TerraformExamPlatform {
         const filtered = questions.filter(q => !this.recentQuestions.includes(q.id));
         return filtered.length >= Math.min(10, questions.length * 0.5) ? filtered : questions;
     }
+
+    formatStudyContent(text) {
+        if (!text) return '';
+        
+        // Convert the formatted text to HTML
+        let html = text
+            // Convert code blocks first (so they don't get processed by other rules)
+            .replace(/```(\w+)?\n?([\s\S]*?)```/g, '<pre><code class="language-$1">$2</code></pre>')
+            
+            // Convert inline code
+            .replace(/`([^`]+)`/g, '<code>$1</code>')
+            
+            // Convert major section headers (ALL CAPS with colons)
+            .replace(/^([A-Z][A-Z\s&\/\-]+):$/gm, '<h4>$1:</h4>')
+            
+            // Convert numbered section headers (like "1. SECTION NAME:")
+            .replace(/^(\d+)\.\s+([A-Z][A-Z\s&\/\-]+):$/gm, '<h5>$1. $2:</h5>')
+            
+            // Convert subsection headers (Mixed Case with colons at end of line)
+            .replace(/^([A-Z][a-zA-Z\s]+):$/gm, '<h6>$1:</h6>')
+            
+            // Convert bullet points
+            .replace(/^• (.+)$/gm, '<li class="bullet-item">$1</li>')
+            
+            // Convert example indicators
+            .replace(/^Example:\s*(.+)$/gm, '<div class="example-block"><strong>Example:</strong> $1</div>')
+            
+            // Convert "Think of" analogies
+            .replace(/^Think of (.+)$/gm, '<div class="analogy-block"><strong>💡 Think of it:</strong> $1</div>');
+            
+        // Now process paragraphs and lists
+        const sections = html.split(/\n\s*\n/);
+        const processedSections = sections.map(section => {
+            if (!section.trim()) return '';
+            
+            // If section contains list items, wrap in ul
+            if (section.includes('<li class="bullet-item">')) {
+                const listItems = section.replace(/\n/g, '');
+                return '<ul>' + listItems + '</ul>';
+            }
+            
+            // If it's a header, return as is
+            if (section.includes('<h4>') || section.includes('<h5>') || section.includes('<h6>')) {
+                return section;
+            }
+            
+            // If it's a code block, return as is
+            if (section.includes('<pre>')) {
+                return section;
+            }
+            
+            // If it's an example or analogy block, return as is
+            if (section.includes('<div class="example-block">') || section.includes('<div class="analogy-block">')) {
+                return section;
+            }
+            
+            // Otherwise, it's a regular paragraph
+            return '<p>' + section.replace(/\n/g, '<br>') + '</p>';
+        });
+        
+        // Join sections and clean up
+        html = processedSections.join('\n');
+        
+        // Clean up consecutive lists
+        html = html.replace(/<\/ul>\s*<ul>/g, '');
+        
+        return html;
+    }
 }
 
 // Initialize the platform when the page loads
@@ -714,4 +845,14 @@ function showResults() {
 
 function startNewExam() {
     platform.startNewExam();
+}
+
+function navigateObjective(direction) {
+    try {
+        if (!platform) throw new Error('Platform not initialized');
+        platform.navigateObjective(direction);
+    } catch (error) {
+        console.error('Error in navigateObjective:', error);
+        alert('Error: ' + error.message);
+    }
 }
