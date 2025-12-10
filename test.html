@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test studyGuide</title>
+</head>
+<body>
+    <h1>Testing studyGuide</h1>
+    <div id="result"></div>
+    
+    <script src="questions_categorized.js"></script>
+    <script>
+        const resultDiv = document.getElementById('result');
+        
+        if (typeof studyGuide === 'undefined') {
+            resultDiv.innerHTML = '<p style="color: red;">ERROR: studyGuide is not defined</p>';
+        } else {
+            resultDiv.innerHTML = '<p style="color: green;">SUCCESS: studyGuide is defined</p>';
+            resultDiv.innerHTML += '<p>Number of objectives: ' + Object.keys(studyGuide).length + '</p>';
+            resultDiv.innerHTML += '<p>examQuestions count: ' + examQuestions.length + '</p>';
+        }
+    </script>
+</body>
+</html>

@@ -46,6 +46,13 @@ class TerraformExamPlatform {
     }
 
     init() {
+        // Wait for studyGuide to be available
+        if (typeof studyGuide === 'undefined') {
+            console.log('Waiting for studyGuide to load...');
+            setTimeout(() => this.init(), 100);
+            return;
+        }
+        
         this.populateStudyGuide();
         this.populateCategoryExams();
         this.setupKeyboardNavigation();
@@ -102,6 +109,12 @@ class TerraformExamPlatform {
             console.error('objectives-grid element not found');
             return;
         }
+        
+        if (typeof studyGuide === 'undefined') {
+            console.error('studyGuide is not defined');
+            return;
+        }
+        
         grid.innerHTML = '';
 
         // Convert studyGuide object to array and iterate
@@ -122,6 +135,11 @@ class TerraformExamPlatform {
     }
 
     showObjectiveDetail(objectiveId) {
+        if (typeof studyGuide === 'undefined') {
+            console.error('studyGuide is not defined in showObjectiveDetail');
+            return;
+        }
+        
         const objective = studyGuide[objectiveId];
         if (!objective) {
             console.error('Objective not found:', objectiveId);
@@ -202,6 +220,12 @@ class TerraformExamPlatform {
             console.error('category-grid element not found');
             return;
         }
+        
+        if (typeof studyGuide === 'undefined') {
+            console.error('studyGuide is not defined in populateCategoryExams');
+            return;
+        }
+        
         grid.innerHTML = '';
 
         Object.keys(studyGuide).forEach(objectiveId => {
@@ -515,6 +539,11 @@ class TerraformExamPlatform {
 
         Object.entries(this.results.objectiveScores).forEach(([objectiveId, scores]) => {
             if (scores.total === 0) return;
+            
+            if (typeof studyGuide === 'undefined') {
+                console.error('studyGuide is not defined in displayObjectiveBreakdown');
+                return;
+            }
 
             const objective = studyGuide[objectiveId];
             if (!objective) return;
