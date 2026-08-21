@@ -4,20 +4,20 @@
 A comprehensive, modern practice platform for the HashiCorp Terraform Associate (003) certification exam featuring an interactive study guide, multiple exam formats, advanced performance analytics, and full mobile responsiveness.
 
 ## Features
-- **📚 Interactive Study Guide**: Comprehensive study materials organized by all 9 certification objectives
-- **🎯 Multiple Exam Formats**:
+- **Interactive Study Guide**: Comprehensive study materials organized by all 9 certification objectives
+- **Multiple Exam Formats**:
   - Full practice exam (30 questions, 45 minutes)
   - Category-based exams for focused study (per objective)
   - Objective-specific practice questions
-- **📊 Advanced Performance Analytics**:
+- **Advanced Performance Analytics**:
   - Detailed breakdown by certification objectives
   - Score tracking and improvement recommendations
   - Question review with detailed explanations
-- **🔄 Dynamic Question System**: 50+ randomized questions from comprehensive question bank
-- **� Dark/Light Theme Toggle**: Modern theme switching with persistent preferences
-- **📱 Fully Mobile Responsive**: Optimized for all devices (iPhone, Android, tablets, desktop)
-- **⚡ Zero Dependencies**: Lightweight, fast-loading vanilla JavaScript application
-- **🐳 Simplified Docker Setup**: Easy containerized deployment without complex orchestration
+- **Dynamic Question System**: 50+ randomized questions from comprehensive question bank
+- **Dark/Light Theme Toggle**: Modern theme switching with persistent preferences
+- **Fully Mobile Responsive**: Optimized for all devices (iPhone, Android, tablets, desktop)
+- **Zero Dependencies**: Lightweight, fast-loading vanilla JavaScript application
+- **Simplified Docker Setup**: Easy containerized deployment without complex orchestration
 
 ### Study Guide Coverage (All 9 Objectives)
 
